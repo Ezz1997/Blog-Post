@@ -1,0 +1,17 @@
+/* body,
+html {
+    margin: 0;
+} */
+
+.flex-container{
+    display: flex;
+    flex: 1;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+.grid-container{
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+}
