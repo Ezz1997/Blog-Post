@@ -12,6 +12,9 @@ import {
   useLocation,
 } from "react-router";
 import "./styles.css";
+import SignIn from "./components/sign-in/SignIn";
+import ForgotPassword from "./components/sign-in/ForgotPassword";
+import SignUp from "./components/sign-in/SignUp";
 
 function MainLayout() {
   const location = useLocation();
@@ -29,6 +32,9 @@ function MainLayout() {
           <Routes>
             <Route index element={<Homepage />} />
             <Route path="/blog-post" element={<BlogPost />} />
+            <Route path="/sign-in" element={<SignIn />} />
+            <Route path="/sign-up" element={<SignUp />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="*" element={<Error />} />
           </Routes>
         </main>

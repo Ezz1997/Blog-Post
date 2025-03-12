@@ -435,6 +435,7 @@ export default function ToolbarPlugin() {
   const [isUnderline, setIsUnderline] = useState(false);
   const [isStrikethrough, setIsStrikethrough] = useState(false);
   const [isCode, setIsCode] = useState(false);
+  const [isHighlight, setIsHighlight] = useState(false);
 
   const updateToolbar = useCallback(() => {
     const selection = $getSelection();
@@ -468,6 +469,7 @@ export default function ToolbarPlugin() {
       setIsUnderline(selection.hasFormat("underline"));
       setIsStrikethrough(selection.hasFormat("strikethrough"));
       setIsCode(selection.hasFormat("code"));
+      setIsHighlight(selection.hasFormat("highlight"));
 
       // Update links
       const node = getSelectedNode(selection);
@@ -599,6 +601,7 @@ export default function ToolbarPlugin() {
             onClick={() => {
               editor.dispatchCommand(FORMAT_TEXT_COMMAND, "highlight");
             }}
+            className={"toolbar-item spaced " + (isHighlight ? "active" : "")}
           >
             <AutoFixHigh />
           </IconButton>
