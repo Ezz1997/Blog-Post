@@ -94,9 +94,9 @@ function SignUp() {
     e.preventDefault();
 
     if (
-      !formData.firstname &&
-      !formData.lastname &&
-      !formData.email &&
+      !formData.firstname ||
+      !formData.lastname ||
+      !formData.email ||
       !formData.password
     ) {
       console.log("Make sure to fill out all fields");
