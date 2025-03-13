@@ -4,6 +4,7 @@ import {
   FormControl,
   InputLabel,
   OutlinedInput,
+  FormHelperText,
 } from "@mui/material";
 import { useState } from "react";
 import Visibility from "@mui/icons-material/Visibility";
@@ -13,6 +14,8 @@ export default function CustomPasswordField({
   value,
   onChange,
   customWidth = "100%",
+  error,
+  helperText,
 }) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -23,7 +26,7 @@ export default function CustomPasswordField({
   };
 
   return (
-    <FormControl sx={{ my: 2, width: customWidth }} variant="outlined" required>
+    <FormControl sx={{ my: 2, width: customWidth }} error={error}>
       <InputLabel size="small" htmlFor="outlined-adornment-password">
         Password
       </InputLabel>
@@ -53,6 +56,11 @@ export default function CustomPasswordField({
         }
         label="Password"
       />
+      {error && (
+        <FormHelperText error id="accountId-error">
+          {helperText}
+        </FormHelperText>
+      )}
     </FormControl>
   );
 }
