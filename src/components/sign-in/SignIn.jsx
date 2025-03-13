@@ -159,6 +159,7 @@ const theme = createTheme({
   palette: {
     background: {
       paper: "#222831",
+      default: "#eee",
     },
     text: {
       primary: "#fff",
