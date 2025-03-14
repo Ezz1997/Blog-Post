@@ -19,6 +19,7 @@ import {
 } from "./ValidationFunctions";
 
 import { INITIAL_STATE, postReducer } from "./postReducer";
+import { ACTION_TYPES } from "./postActionTypes";
 
 const theme = createTheme({
   palette: {
@@ -112,10 +113,10 @@ function SignUp() {
       }
     }
 
-    dispatch({ type: "POST_START" });
+    dispatch({ type: ACTION_TYPES.POST_START });
 
     setTimeout(() => {
-      dispatch({ type: "POST_SUCCESS" });
+      dispatch({ type: ACTION_TYPES.POST_SUCCESS });
     }, 2000);
 
     console.log(formData);
