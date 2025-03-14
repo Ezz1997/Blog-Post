@@ -10,13 +10,15 @@ import {
 } from "@mui/material";
 import { createTheme } from "@mui/material";
 import { Link as RouterLink } from "react-router";
-import { useState } from "react";
+import { useState, useReducer } from "react";
 import CustomPasswordField from "./CustomPasswordField";
 import {
   validateEmail,
   validateName,
   validatePassword,
 } from "./ValidationFunctions";
+
+import { INITIAL_STATE, postReducer } from "./postReducer";
 
 const theme = createTheme({
   palette: {
@@ -56,7 +58,7 @@ const theme = createTheme({
 });
 
 function SignUp() {
-  const [loading, setLoading] = useState(false);
+  const [state, dispatch] = useReducer(postReducer, INITIAL_STATE);
 
   const [formData, setFormData] = useState({
     firstname: "",
@@ -110,9 +112,10 @@ function SignUp() {
       }
     }
 
-    setLoading(true);
+    dispatch({ type: "POST_START" });
+
     setTimeout(() => {
-      setLoading(false);
+      dispatch({ type: "POST_SUCCESS" });
     }, 2000);
 
     console.log(formData);
@@ -203,7 +206,20 @@ function SignUp() {
         <Link to="/sign-in" component={RouterLink}>
           Already have an account?
         </Link>
-        {loading && <CircularProgress />}
+        {state.loading && <CircularProgress />}
+        {state.success && (
+          <Alert
+            severity="success"
+            sx={{
+              "& .MuiAlert-icon": { color: "#222831" },
+              bgcolor: "#F6B17A",
+              color: "#222831",
+            }}
+          >
+            Account Created Successfully!
+          </Alert>
+        )}
+        {state.error && <Alert severity="error">Something went wrong!</Alert>}
       </Stack>
     </ThemeProvider>
   );

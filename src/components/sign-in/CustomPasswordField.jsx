@@ -14,8 +14,8 @@ export default function CustomPasswordField({
   value,
   onChange,
   customWidth = "100%",
-  error,
-  helperText,
+  error = false,
+  helperText = "",
 }) {
   const [showPassword, setShowPassword] = useState(false);
 
