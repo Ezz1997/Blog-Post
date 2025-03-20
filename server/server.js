@@ -31,7 +31,34 @@ const getUsersHandler = async (req, res) => {
 
 // Route handler for GET /api/users/:id
 // Get user by id
-const getUserByIdHandler = async (req, res) => {};
+const getUserByIdHandler = async (req, res) => {
+  try {
+    const id = req.url.split("/")[3];
+    const coll = db.collection("users");
+
+    const user = await coll.findOne(
+      {
+        _id: ObjectId.createFromHexString(id),
+      },
+      { projection: { password: 0 } }
+    );
+
+    /* Print a message that indicates whether the operation deleted a
+      document */
+    if (user) {
+      res.statusCode = 200;
+      res.end(JSON.stringify(user));
+    } else {
+      console.log("User not found");
+      res.statusCode = 404;
+      res.end(JSON.stringify({ error: "User not found" }));
+    }
+  } catch (error) {
+    console.error(error);
+    res.statusCode = 500;
+    res.end(JSON.stringify({ error: "Internal Server Error" }));
+  }
+};
 
 // Route handler for POST /api/users/signup
 // Create New User
@@ -181,10 +208,14 @@ const server = createServer((req, res) => {
       req.method === "DELETE"
     ) {
       deleteUserByIdHandler(req, res);
+    } else if (
+      req.url.match(/\/api\/users\/([0-9a-fA-F]{24})/) &&
+      req.method === "GET"
+    ) {
+      getUserByIdHandler(req, res);
     } else {
       res.statusCode = 404;
-      res.write(JSON.stringify({ message: "idk man you got an error" }));
-      res.end();
+      res.end(JSON.stringify({ error: "Invalid URL" }));
     }
   });
 });
