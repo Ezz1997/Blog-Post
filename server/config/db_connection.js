@@ -15,4 +15,11 @@ try {
 
 const db = client.db(DB_NAME);
 
+// 🛠 Handle graceful shutdown
+process.on("SIGINT", async () => {
+  await client.close();
+  console.log("Database connection closed.");
+  process.exit(0);
+});
+
 export default db;

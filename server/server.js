@@ -5,12 +5,6 @@ import bcrypt from "bcryptjs";
 const PORT = process.env.PORT;
 const HOST_NAME = process.env.HOST_NAME;
 
-// Logger middleware
-const logger = (req, res, next) => {
-  console.log(`${req.method} ${req.url}`);
-  next();
-};
-
 // Json middleware
 const jsonMiddleware = (req, res, next) => {
   res.setHeader("Content-Type", "json/application");
@@ -29,8 +23,8 @@ const getUsersHandler = async (req, res) => {
     res.end(JSON.stringify(users));
   } catch (error) {
     console.error(error);
-    res.statusCode = 400;
-    res.end(JSON.stringify({ error: "Invalid Request" }));
+    res.statusCode = 500;
+    res.end(JSON.stringify({ error: "Internal Server Error" }));
   }
 };
 
@@ -93,6 +87,51 @@ const createUserHandler = (req, res) => {
   });
 };
 
+// Route handler for POST /api/users/login
+// User login
+const userLoginHandler = async (req, res) => {
+  let body = "";
+
+  req.on("data", (chunk) => {
+    body += chunk;
+  });
+
+  req.on("end", async () => {
+    try {
+      // Parse Json
+      let user = JSON.parse(body);
+      const { email, password } = user;
+
+      // Validate input
+      if (!email || !password) {
+        res.statusCode = 400;
+        res.end(JSON.stringify({ error: "All fields are required" }));
+        return;
+      }
+
+      const coll = db.collection("users");
+      const existingUser = await coll.findOne({ email });
+
+      if (existingUser) {
+        const result = await bcrypt.compare(password, existingUser.password);
+
+        if (result) {
+          res.statusCode = 200;
+          res.end(JSON.stringify({ message: "Successful Login" }));
+          return;
+        }
+      }
+
+      res.statusCode = 401;
+      res.end(JSON.stringify({ error: "Unauthorized Access" }));
+    } catch (error) {
+      console.error(error);
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: "Internal Server Error" }));
+    }
+  });
+};
+
 // Route handler for PATCH /api/users/:id
 // Update user by id
 const updateUserHandler = async (req, res) => {};
@@ -102,18 +141,18 @@ const updateUserHandler = async (req, res) => {};
 const deleteUserHandler = async (req, res) => {};
 
 const server = createServer((req, res) => {
-  logger(req, res, () => {
-    jsonMiddleware(req, res, () => {
-      if (req.url === "/api/users/signup" && req.method === "POST") {
-        createUserHandler(req, res);
-      } else if (req.url === "/api/users" && req.method === "GET") {
-        getUsersHandler(req, res);
-      } else {
-        res.statusCode = 404;
-        res.write(JSON.stringify({ message: "idk man you got an error" }));
-        res.end();
-      }
-    });
+  jsonMiddleware(req, res, () => {
+    if (req.url === "/api/users/signup" && req.method === "POST") {
+      createUserHandler(req, res);
+    } else if (req.url === "/api/users" && req.method === "GET") {
+      getUsersHandler(req, res);
+    } else if (req.url === "/api/users/login" && req.method === "POST") {
+      userLoginHandler(req, res);
+    } else {
+      res.statusCode = 404;
+      res.write(JSON.stringify({ message: "idk man you got an error" }));
+      res.end();
+    }
   });
 });
 
