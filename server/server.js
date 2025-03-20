@@ -1,6 +1,7 @@
 import { createServer } from "http";
 import db from "./config/db_connection.js";
 import bcrypt from "bcryptjs";
+import { ObjectId } from "mongodb";
 
 const PORT = process.env.PORT;
 const HOST_NAME = process.env.HOST_NAME;
@@ -138,7 +139,34 @@ const updateUserHandler = async (req, res) => {};
 
 // Route handler for DELETE /api/users/:id
 // Delete user by id
-const deleteUserHandler = async (req, res) => {};
+const deleteUserByIdHandler = async (req, res) => {
+  try {
+    const id = req.url.split("/")[3];
+    const coll = db.collection("users");
+
+    const result = await coll.deleteOne({
+      _id: ObjectId.createFromHexString(id),
+    });
+
+    /* Print a message that indicates whether the operation deleted a
+      document */
+    if (result.deletedCount === 1) {
+      console.log("Successfully deleted one document.");
+      res.statusCode = 200;
+      res.end(
+        JSON.stringify({ message: "Successfully deleted one document." })
+      );
+    } else {
+      console.log("No documents matched the query. Deleted 0 documents.");
+      res.statusCode = 204;
+      res.end();
+    }
+  } catch (error) {
+    console.error(error);
+    res.statusCode = 500;
+    res.end(JSON.stringify({ error: "Internal Server Error" }));
+  }
+};
 
 const server = createServer((req, res) => {
   jsonMiddleware(req, res, () => {
@@ -148,6 +176,11 @@ const server = createServer((req, res) => {
       getUsersHandler(req, res);
     } else if (req.url === "/api/users/login" && req.method === "POST") {
       userLoginHandler(req, res);
+    } else if (
+      req.url.match(/\/api\/users\/([0-9a-fA-F]{24})/) &&
+      req.method === "DELETE"
+    ) {
+      deleteUserByIdHandler(req, res);
     } else {
       res.statusCode = 404;
       res.write(JSON.stringify({ message: "idk man you got an error" }));
