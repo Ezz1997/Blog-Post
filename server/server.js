@@ -8,7 +8,7 @@ const HOST_NAME = process.env.HOST_NAME;
 
 // Json middleware
 const jsonMiddleware = (req, res, next) => {
-  res.setHeader("Content-Type", "json/application");
+  res.setHeader("Content-Type", "application/json");
   next();
 };
 
@@ -16,7 +16,7 @@ const jsonMiddleware = (req, res, next) => {
 // Get list of all users
 const getUsersHandler = async (req, res) => {
   const coll = db.collection("users");
-  const users = await coll.find().project({ _id: 0, password: 0 }).toArray();
+  const users = await coll.find().project({ password: 0 }).toArray();
   console.log(users);
 
   try {
@@ -43,8 +43,6 @@ const getUserByIdHandler = async (req, res) => {
       { projection: { password: 0 } }
     );
 
-    /* Print a message that indicates whether the operation deleted a
-      document */
     if (user) {
       res.statusCode = 200;
       res.end(JSON.stringify(user));
@@ -159,10 +157,6 @@ const userLoginHandler = async (req, res) => {
     }
   });
 };
-
-// Route handler for PATCH /api/users/:id
-// Update user by id
-const updateUserHandler = async (req, res) => {};
 
 // Route handler for DELETE /api/users/:id
 // Delete user by id
