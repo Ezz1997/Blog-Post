@@ -1,6 +1,7 @@
 import request from "supertest";
 import dotenv from "dotenv";
 import assert from "assert";
+import randomString from "../utils/randomStringGenerator.js";
 
 dotenv.config({ path: "../.env" });
 
@@ -8,10 +9,46 @@ const PORT = process.env.PORT;
 const HOST_NAME = process.env.HOST_NAME;
 const URL = `http://${HOST_NAME}:${PORT}`;
 
+let loginToken = "";
+
+// Test for /api/users/login
+// Description: Login to get a jwt token before running other tests
+// Testcase: Successful login, Response: object {login: true, token: {24 characters hexadicmal string}}
+await request(URL)
+  .post("/api/users/login")
+  .send({ email: "test10@gmail.com", password: "1231231231" })
+  .expect(200)
+  .expect((res) => {
+    assert(
+      res.body.hasOwnProperty("token"),
+      "Login response should contain a token field"
+    );
+    assert(
+      res.body.hasOwnProperty(
+        "login",
+        "Login response should contain a login field"
+      )
+    );
+    assert.equal(typeof res.body, "object", "Response must be an object");
+  })
+  .then((res) => {
+    loginToken = res.body.token;
+    console.log("Test Passed - POST /api/users/login: Generate jwt token");
+  })
+  .catch((err) =>
+    console.error(
+      "Test Failed - POST /api/users/login: Generate jwt token ",
+      err
+    )
+  );
+
 // Test for GET /api/users
 // Description: Get a list of all users
+// Testcase: A non empty list of users must be returned
 request(URL)
   .get("/api/users")
+  .set("Authorization", loginToken)
+  .set("Content-Type", "application/json")
   .expect(200)
   .expect("Content-Type", "application/json")
   .expect((res) => {
@@ -32,37 +69,45 @@ request(URL)
       assert.equal(Object.keys(user).length, 4, "User Must have only 4 fields");
     });
   })
-  .then(() => console.log("Test Passed!"))
-  .catch((err) => console.error("Test failed: ", err));
+  .then(() => console.log("Test Passed - GET /api/users: Get all users"))
+  .catch((err) =>
+    console.error("Test Failed - GET /api/users: Get all users ", err)
+  );
 
 // Test for GET /api/users/:id
 // Description: Get user by id
 // Testcase: User Exists
 request(URL)
-  .get("/api/users/67dabfe854ce33216e2a12ad")
+  .get("/api/users/67e276bc8442b52f828f15b1")
+  .set("Authorization", loginToken)
+  .set("Content-Type", "application/json")
   .expect(200)
   .expect("Content-Type", "application/json")
   .expect((res) => {
     let user = res.body;
 
-    assert(typeof user === "object", "A User object must be returned");
+    assert.equal(typeof user, "object", "A User object must be returned");
 
     // Existing fields
     assert.equal(
       user._id,
-      "67dabfe854ce33216e2a12ad",
-      "_id must be equal to: 67dabfe854ce33216e2a12ad"
+      "67e276bc8442b52f828f15b1",
+      "_id must be equal to: 67e276bc8442b52f828f15b1"
     );
-    assert.equal(user.firstname, "Jack", "firstname must by equal to: Jack");
+    assert.equal(
+      user.firstname,
+      "testdontdelete",
+      "firstname must by equal to: testdontdelete"
+    );
     assert.equal(
       user.lastname,
-      "Dempsey",
-      "lastname must be equal to: Dempsey"
+      "testdontdelete",
+      "lastname must be equal to: testdontdelete"
     );
     assert.equal(
       user.email,
-      "test5@gmail.com",
-      "email must be equal to test5@gmail.com"
+      "testdontdelete@gmail.com",
+      "email must be equal to testdontdelete@gmail.com"
     );
 
     // Non existing fields
@@ -71,14 +116,16 @@ request(URL)
     // Number of fields
     assert.equal(Object.keys(user).length, 4, "User Must have only 4 fields");
   })
-  .then(() => console.log("Test Passed!"))
-  .catch((err) => console.error("Test failed: ", err));
+  .then(() => console.log("Test Passed - GET /api/users/:id"))
+  .catch((err) => console.error("Test Failed - GET /api/users/:id ", err));
 
 // Test for GET /api/users/:id
 // Description: Get user by id
 // Testcase: User Doesn't Exist
 request(URL)
   .get("/api/users/67dabfe854ce33216e2a12af")
+  .set("Authorization", loginToken)
+  .set("Content-Type", "application/json")
   .expect(404)
   .expect("Content-Type", "application/json")
   .expect((res) => {
@@ -89,8 +136,28 @@ request(URL)
       "Error Message must be equal to: User not found"
     );
   })
-  .then(() => console.log("Test Passed!"))
-  .catch((err) => console.error("Test failed: ", err));
+  .then(() => console.log("Test Passed - GET /api/users/:id"))
+  .catch((err) => console.error("Test Failed - GET /api/users/:id ", err));
+
+// Test for GET /api/users/:id
+// Description: Get user by id
+// Testcase: Invalid id
+request(URL)
+  .get("/api/users/123")
+  .set("Authorization", loginToken)
+  .set("Content-Type", "application/json")
+  .expect(400)
+  .expect("Content-Type", "application/json")
+  .expect((res) => {
+    assert(res.body.hasOwnProperty("error"), "Body must contain error message");
+    assert.equal(
+      res.body.error,
+      "Invalid User ID format",
+      "Error Message must be equal to: Invalid User ID format"
+    );
+  })
+  .then(() => console.log("Test Passed - GET /api/users/:id"))
+  .catch((err) => console.error("Test Failed - GET /api/users/:id ", err));
 
 // a function template for testing signup api with different inputs
 function test_signup(payload, statusCode, message) {
@@ -111,8 +178,10 @@ function test_signup(payload, statusCode, message) {
         `Message must be equal to: ${message.text}`
       );
     })
-    .then(() => console.log("Test Passed!"))
-    .catch((err) => console.error("Test failed: ", err));
+    .then(() => console.log("Test Passed - POST /api/users/signup"))
+    .catch((err) =>
+      console.error("Test Failed - POST /api/users/signup ", err)
+    );
 }
 
 // Test for POST /api/users/signup
@@ -121,10 +190,10 @@ function test_signup(payload, statusCode, message) {
 // Testcase: User created successfully
 test_signup(
   {
-    firstname: "D",
-    lastname: "D",
-    email: "D@gmail.com",
-    password: "D",
+    firstname: randomString(7),
+    lastname: randomString(7),
+    email: `${randomString(7)}@gmail.com`,
+    password: randomString(8),
   },
   201,
   { text: "User Created Successfully", type: "message" }
@@ -136,10 +205,10 @@ test_signup(
 // Testcase: User already exists Error
 test_signup(
   {
-    firstname: "C",
-    lastname: "C",
-    email: "C@gmail.com",
-    password: "C",
+    firstname: "testdontdelete",
+    lastname: "testdontdelete",
+    email: "testdontdelete@gmail.com",
+    password: "testdontdelete",
   },
   409,
   { text: "User Already exists!", type: "error" }
@@ -160,7 +229,7 @@ test_signup(
   { text: "All fields are required", type: "error" }
 );
 
-// a function template for testing signin api with different inputs
+// a function template for testing login api with different inputs
 function test_login(payload, statusCode, message) {
   request(URL)
     .post("/api/users/login")
@@ -179,17 +248,9 @@ function test_login(payload, statusCode, message) {
         `Message must be equal to: ${message.text}`
       );
     })
-    .then(() => console.log("Test Passed!"))
-    .catch((err) => console.error("Test failed: ", err));
+    .then(() => console.log("Test Passed - POST /api/users/login"))
+    .catch((err) => console.error("Test failed - POST /api/users/login ", err));
 }
-
-// Test for POST /api/users/login
-// Description: login by email and password
-// Testcase: login Successfull
-test_login({ email: "test10@gmail.com", password: "1231231231" }, 200, {
-  text: "Successful Login",
-  type: "message",
-});
 
 // Test for POST /api/users/login
 // Description: login by email and password
@@ -209,12 +270,61 @@ test_login({ email: "test10@gmail.com", password: "123456" }, 401, {
 
 // Test for DELETE /api/users/:id
 // Description: delete user by id
+// Testcase: User doesnt exist
+request(URL)
+  .delete("/api/users/67deb406a8ebaf1660fcad53")
+  .set("Authorization", loginToken)
+  .set("Content-Type", "application/json")
+  .expect(404)
+  .expect("Content-Type", "application/json")
+  .expect((response) => {
+    let res = response.body;
+
+    assert.equal(typeof res, "object", "Response must contain an object");
+    assert(res.hasOwnProperty("error"), "Response must contain an error field");
+    assert.equal(
+      res.error,
+      "User not found",
+      "Error Message must be equal to: User not found"
+    );
+  })
+  .then(() => console.log("Test Passed - DELETE /api/users/:id"))
+  .catch((err) => console.error("Test Failed - DELETE /api/users/:id ", err));
+
+// Test for DELETE /api/users/:id
+// Description: delete user by id
+// Testcase: Invalid id
+request(URL)
+  .delete("/api/users/123")
+  .set("Authorization", loginToken)
+  .set("Content-Type", "application/json")
+  .expect(400)
+  .expect("Content-Type", "application/json")
+  .expect((response) => {
+    let res = response.body;
+
+    assert.equal(typeof res, "object", "Response must contain an object");
+    assert(res.hasOwnProperty("error"), "Response must contain an error field");
+    assert.equal(
+      res.error,
+      "Invalid User ID format",
+      "Error Message must be equal to: Invalid User ID format"
+    );
+  })
+  .then(() => console.log("Test Passed - DELETE /api/users/:id"))
+  .catch((err) => console.error("Test Failed - DELETE /api/users/:id ", err));
+
+// Test for DELETE /api/users/:id
+// Description: delete user by id
 // Testcase: User Exists
 request(URL)
-  .delete("/api/users/67deb406a8ebaf1660fcad55")
+  .delete("/api/users/67e2a5200f308865f384accc")
+  .set("Authorization", loginToken)
+  .set("Content-Type", "application/json")
   .expect(200)
   .expect("Content-Type", "application/json")
   .expect((res) => {
+    assert.equal(typeof res.body, "object", "Response must contain an object");
     assert(res.body.hasOwnProperty("message"), "Body must contain message");
     assert.equal(
       res.body.message,
@@ -222,15 +332,18 @@ request(URL)
       "Message must be equal to: Successfully deleted one document."
     );
   })
-  .then(() => console.log("Test Passed!"))
-  .catch((err) => console.error("Test failed: ", err));
-
-// Test for DELETE /api/users/:id
-// Description: delete user by id
-// Testcase: User Exists
-request(URL)
-  .delete("/api/users/67deb406a8ebaf1660fcad53")
-  .expect(204)
-  .expect("Content-Type", "application/json")
-  .then(() => console.log("Test Passed!"))
-  .catch((err) => console.error("Test failed: ", err));
+  .then(() => {
+    test_signup(
+      {
+        _id: "67e2a5200f308865f384accc",
+        firstname: "deleteReadd",
+        lastname: "deleteReadd",
+        email: "deleteReadd@gmail.com",
+        password: "deleteReadd",
+      },
+      201,
+      { text: "User Created Successfully", type: "message" }
+    );
+  })
+  .then(() => console.log("Test Passed - DELETE /api/users/:id"))
+  .catch((err) => console.error("Test Failed - DELETE /api/users/:id ", err));

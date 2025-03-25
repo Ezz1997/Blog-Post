@@ -89,13 +89,18 @@ const createUserHandler = (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // Create new password
-        const result = await coll.insertOne({
-          ...newUser,
-          password: hashedPassword,
-        });
-
-        console.log(result);
+        if (newUser._id) {
+          await coll.insertOne({
+            ...newUser,
+            password: hashedPassword,
+            _id: ObjectId.createFromHexString(newUser._id),
+          });
+        } else {
+          await coll.insertOne({
+            ...newUser,
+            password: hashedPassword,
+          });
+        }
 
         res.statusCode = 201;
         res.end(JSON.stringify({ message: "User Created Successfully" }));
@@ -130,7 +135,9 @@ const userLoginHandler = async (req, res) => {
       // Validate input
       if (!email || !password) {
         res.statusCode = 400;
-        res.end(JSON.stringify({ error: "All fields are required" }));
+        res.end(
+          JSON.stringify({ login: false, error: "All fields are required" })
+        );
         return;
       }
 
