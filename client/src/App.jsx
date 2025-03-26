@@ -32,8 +32,8 @@ function MainLayout() {
           <Routes>
             <Route index element={<Homepage />} />
             <Route path="/blog-post" element={<BlogPost />} />
-            <Route path="/sign-in" element={<SignIn />} />
-            <Route path="/sign-up" element={<SignUp />} />
+            <Route path="/login" element={<SignIn />} />
+            <Route path="/signup" element={<SignUp />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="*" element={<Error />} />
           </Routes>
