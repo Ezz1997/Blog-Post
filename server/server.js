@@ -9,7 +9,7 @@ const headers = new Headers({
   "Access-Control-Allow-Origin": whitelist,
   "Access-Control-Allow-Methods": "OPTIONS, GET, POST, DELETE, PUT, PATCH",
   "Access-Control-Allow-Headers": "Content-Type",
-  "Access-Control-Max-Age": 120,
+  "Access-Control-Max-Age": 864000, // 10 days in seconds
 });
 
 // Json middleware
