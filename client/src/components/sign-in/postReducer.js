@@ -10,20 +10,19 @@ export const postReducer = (state, action) => {
   switch (action.type) {
     case ACTION_TYPES.POST_START:
       return {
-        required: false,
         loading: true,
         success: false,
         error: false,
       };
     case ACTION_TYPES.POST_SUCCESS:
       return {
-        ...state,
+        error: false,
         loading: false,
         success: true,
       };
     case ACTION_TYPES.POST_ERROR:
       return {
-        ...state,
+        success: false,
         loading: false,
         error: true,
       };
