@@ -3,6 +3,14 @@ import userRoutes from "./routes/userRoutes.js";
 
 const PORT = process.env.PORT || 4000;
 const HOST_NAME = process.env.HOST_NAME;
+const whitelist = [process.env.HOST1];
+
+const headers = new Headers({
+  "Access-Control-Allow-Origin": whitelist,
+  "Access-Control-Allow-Methods": "OPTIONS, GET, POST, DELETE, PUT, PATCH",
+  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Max-Age": 120,
+});
 
 // Json middleware
 const jsonMiddleware = async (req, res, next) => {
@@ -11,6 +19,14 @@ const jsonMiddleware = async (req, res, next) => {
 };
 
 const server = createServer((req, res) => {
+  res.setHeaders(headers);
+
+  if (req.method === "OPTIONS") {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+
   jsonMiddleware(req, res, () => {
     try {
       const method = req.method;
