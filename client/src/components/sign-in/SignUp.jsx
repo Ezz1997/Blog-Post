@@ -59,6 +59,7 @@ const theme = createTheme({
 });
 
 function SignUp() {
+  const [message, setMessage] = useState("");
   const [state, dispatch] = useReducer(postReducer, INITIAL_STATE);
 
   const [formData, setFormData] = useState({
@@ -93,7 +94,7 @@ function SignUp() {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (
@@ -115,11 +116,36 @@ function SignUp() {
 
     dispatch({ type: ACTION_TYPES.POST_START });
 
-    setTimeout(() => {
-      dispatch({ type: ACTION_TYPES.POST_SUCCESS });
-    }, 2000);
+    try {
+      const res = await fetch("http://localhost:8000/api/users/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstname: formData.firstname,
+          lastname: formData.lastname,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
 
-    console.log(formData);
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw data.error || "";
+      }
+
+      setMessage(data.message);
+      dispatch({ type: ACTION_TYPES.POST_SUCCESS });
+
+      console.log(data);
+    } catch (err) {
+      setMessage(typeof err === "string" ? err : "");
+      dispatch({ type: ACTION_TYPES.POST_ERROR });
+
+      console.error(err);
+    }
   };
 
   return (
@@ -217,10 +243,12 @@ function SignUp() {
               color: "#222831",
             }}
           >
-            Account Created Successfully!
+            {message || "Something went wrong"}
           </Alert>
         )}
-        {state.error && <Alert severity="error">Something went wrong!</Alert>}
+        {state.error && (
+          <Alert severity="error">{message || "Something went wrong"}</Alert>
+        )}
       </Stack>
     </ThemeProvider>
   );
