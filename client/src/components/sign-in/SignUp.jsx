@@ -7,6 +7,7 @@ import {
   Link,
   Alert,
   CircularProgress,
+  Box,
 } from "@mui/material";
 import { createTheme } from "@mui/material";
 import { Link as RouterLink } from "react-router";
@@ -150,106 +151,112 @@ function SignUp() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Stack
-        spacing={2}
+      <Box
         sx={{
-          p: 2,
-          position: "absolute",
-          left: "50%",
-          top: "50%",
-          transform: "translate(-50%, -50%)",
-          width: { xs: "80vw", md: "25vw" },
-          minWidth: "0px",
-          height: { xs: "70vh", sm: "45vh", md: "55vh" },
-          boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px;",
-          borderRadius: "1%",
+          display: "grid",
+          placeItems: "center",
+          width: "100%",
+          minHeight: "100vh", // Ensures content never overflows
         }}
-        style={{ backgroundColor: "#222831" }}
-        component="form"
-        autoComplete="off"
-        alignItems="center"
-        justifyContent="center"
-        onSubmit={handleSubmit}
       >
-        <Typography
-          color="textPrimary"
-          variant="h5"
-          align="center"
-          sx={{ width: "80%" }}
+        <Stack
+          spacing={2}
+          sx={{
+            p: 2,
+            mt: 2,
+            mb: 2,
+            width: { xs: "70%", sm: "350px", md: "370px", xl: "25vw" },
+            minHeight: "480px",
+            boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px;",
+            borderRadius: "1%",
+            backgroundColor: "#222831",
+          }}
+          component="form"
+          autoComplete="off"
+          alignItems="center"
+          justifyContent="center"
+          onSubmit={handleSubmit}
         >
-          Sign up
-        </Typography>
-        <TextField
-          error={!dataValidity["firstname"]}
-          id="firstname"
-          helperText={
-            dataValidity["firstname"] ? "" : "Name must contain only letters"
-          }
-          label="First name"
-          sx={{ width: "80%" }}
-          size="small"
-          name="firstname"
-          value={formData.firstname}
-          onChange={handleChange}
-        />
-        <TextField
-          error={!dataValidity["lastname"]}
-          id="lastname"
-          label="Last name"
-          helperText={
-            dataValidity["lastname"] ? "" : "Name must contain only letters"
-          }
-          sx={{ width: "80%" }}
-          size="small"
-          name="lastname"
-          value={formData.lastname}
-          onChange={handleChange}
-        />
-        <TextField
-          error={!dataValidity["email"]}
-          id="email"
-          label="Email"
-          helperText={dataValidity["email"] ? "" : "Invalid email"}
-          sx={{ width: "80%" }}
-          size="small"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-        />
-        <CustomPasswordField
-          value={formData.password}
-          onChange={handleChange}
-          customWidth={"80%"}
-          error={!dataValidity["password"]}
-          helperText={
-            dataValidity["password"]
-              ? ""
-              : "Password must include upper/lowercase letters, numbers & special characters"
-          }
-        />
-        <Button type="submit" variant="outlined" sx={{ width: "80%" }}>
-          Sign up
-        </Button>
-        <Link to="/sign-in" component={RouterLink}>
-          Already have an account?
-        </Link>
-        {state.loading && <CircularProgress />}
-        {state.success && (
-          <Alert
-            severity="success"
-            sx={{
-              "& .MuiAlert-icon": { color: "#222831" },
-              bgcolor: "#F6B17A",
-              color: "#222831",
-            }}
+          <Typography
+            color="textPrimary"
+            variant="h5"
+            align="center"
+            sx={{ width: "80%" }}
           >
-            {message || "Something went wrong"}
-          </Alert>
-        )}
-        {state.error && (
-          <Alert severity="error">{message || "Something went wrong"}</Alert>
-        )}
-      </Stack>
+            Sign up
+          </Typography>
+          <TextField
+            error={!dataValidity["firstname"]}
+            id="firstname"
+            helperText={
+              dataValidity["firstname"] ? "" : "Name must contain only letters"
+            }
+            label="First name"
+            sx={{ width: "80%" }}
+            size="small"
+            name="firstname"
+            value={formData.firstname}
+            onChange={handleChange}
+          />
+          <TextField
+            error={!dataValidity["lastname"]}
+            id="lastname"
+            label="Last name"
+            helperText={
+              dataValidity["lastname"] ? "" : "Name must contain only letters"
+            }
+            sx={{ width: "80%" }}
+            size="small"
+            name="lastname"
+            value={formData.lastname}
+            onChange={handleChange}
+          />
+          <TextField
+            error={!dataValidity["email"]}
+            id="email"
+            label="Email"
+            helperText={dataValidity["email"] ? "" : "Invalid email"}
+            sx={{ width: "80%" }}
+            size="small"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+          />
+          <CustomPasswordField
+            value={formData.password}
+            onChange={handleChange}
+            customWidth={"80%"}
+            error={!dataValidity["password"]}
+            helperText={
+              dataValidity["password"]
+                ? ""
+                : "Password must include upper/lowercase letters, numbers & special characters"
+            }
+          />
+          <Button type="submit" variant="outlined" sx={{ width: "80%" }}>
+            Sign up
+          </Button>
+          <Link to="/sign-in" component={RouterLink}>
+            Already have an account?
+          </Link>
+          {state.loading && <CircularProgress />}
+          {state.success && (
+            <Alert
+              severity="success"
+              sx={{
+                "& .MuiAlert-icon": { color: "#222831" },
+                bgcolor: "#F6B17A",
+                color: "#222831",
+              }}
+            >
+              {message || "Something went wrong"}
+            </Alert>
+          )}
+          {state.error && (
+            <Alert severity="error">{message || "Something went wrong"}</Alert>
+          )}
+        </Stack>
+      </Box>
     </ThemeProvider>
   );
 }
