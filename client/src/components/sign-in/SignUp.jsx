@@ -236,7 +236,7 @@ function SignUp() {
           <Button type="submit" variant="outlined" sx={{ width: "80%" }}>
             Sign up
           </Button>
-          <Link to="/sign-in" component={RouterLink}>
+          <Link to="/login" component={RouterLink}>
             Already have an account?
           </Link>
           {state.loading && <CircularProgress />}
