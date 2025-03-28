@@ -107,7 +107,7 @@ function CustomButton() {
 
 function SignUpLink() {
   return (
-    <Link to="/sign-up" component={RouterLink}>
+    <Link to="/signup" component={RouterLink}>
       Sign up
     </Link>
   );
