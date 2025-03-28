@@ -195,17 +195,40 @@ const theme = createTheme({
 });
 
 export default function SignIn() {
+  const handleSubmit = (data) => {
+    console.log("Email: ", data.get("email"));
+    console.log("Password: ", data.get("password"));
+
+    fetch("http://localhost:8000/api/users/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: data.get("email"),
+        password: data.get("password"),
+      }),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(res.status);
+        }
+        return res.json();
+      })
+      .then((data) => console.log(data))
+      .catch((err) => console.error(err));
+  };
+
   return (
     <AppProvider theme={theme}>
       <SignInPage
-        signIn={(provider, formData) =>
-          alert(
-            `Logging in with "${provider.name}" and credentials: ${formData.get(
-              "email"
-            )}, ${formData.get("password")}, and checkbox value: ${formData.get(
-              "tandc"
-            )}`
-          )
+        signIn={
+          (provider, formData) => handleSubmit(formData)
+          // alert(
+          //   `Logging in with "${provider.name}" and credentials: ${formData.get(
+          //     "email"
+          //   )}, ${formData.get("password")}, and checkbox value: ${formData.get(
+          //     "tandc"
+          //   )}`
+          // )
         }
         slots={{
           title: Title,
