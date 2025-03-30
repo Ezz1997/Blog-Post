@@ -166,7 +166,7 @@ function SignUp() {
             mt: 2,
             mb: 2,
             width: { xs: "70%", sm: "350px", md: "370px", xl: "25vw" },
-            minHeight: "480px",
+            minHeight: "450px",
             boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px;",
             borderRadius: "1%",
             backgroundColor: "#222831",
