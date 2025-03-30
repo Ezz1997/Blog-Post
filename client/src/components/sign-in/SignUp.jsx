@@ -22,6 +22,9 @@ import {
 import { INITIAL_STATE, postReducer } from "./postReducer";
 import { ACTION_TYPES } from "./postActionTypes";
 
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+const PORT = import.meta.env.VITE_PORT;
+
 const theme = createTheme({
   palette: {
     text: {
@@ -104,13 +107,11 @@ function SignUp() {
       !formData.email ||
       !formData.password
     ) {
-      console.log("Make sure to fill out all fields");
       return;
     }
 
     for (let name in dataValidity) {
       if (!dataValidity[name]) {
-        console.log("Invalid data");
         return;
       }
     }
@@ -118,7 +119,7 @@ function SignUp() {
     dispatch({ type: ACTION_TYPES.POST_START });
 
     try {
-      const res = await fetch("http://localhost:8000/api/users/signup", {
+      const res = await fetch(`${BASE_URL}:${PORT}/api/users/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -139,8 +140,6 @@ function SignUp() {
 
       setMessage(data.message);
       dispatch({ type: ACTION_TYPES.POST_SUCCESS });
-
-      console.log(data);
     } catch (err) {
       setMessage(typeof err === "string" ? err : "");
       dispatch({ type: ACTION_TYPES.POST_ERROR });
