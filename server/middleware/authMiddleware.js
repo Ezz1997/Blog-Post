@@ -4,18 +4,21 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 // JWT authentication middleware
 export const verifyToken = (req, res, next) => {
-  const token = req.headers.authorization;
-  if (!token) {
-    res.statusCode = 401;
-    res.end(JSON.stringify({ error: "Access denied" }));
-    return;
-  }
+  const authHeader = req.headers.authorization;
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    console.log(decoded);
+    if (authHeader) {
+      const token = authHeader.split(" ")[1];
 
-    next(req, res);
+      const decoded = jwt.verify(token, JWT_SECRET);
+      req.user = decoded;
+
+      next(req, res);
+    } else {
+      res.statusCode = 401;
+      res.end(JSON.stringify({ error: "Access denied" }));
+      return;
+    }
   } catch (err) {
     console.error(err);
     res.statusCode = 401;
