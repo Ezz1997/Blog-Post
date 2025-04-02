@@ -4,13 +4,14 @@ import {
   createUserHandler,
   userLoginHandler,
   deleteUserByIdHandler,
+  refreshToken,
 } from "../controllers/userController.js";
-import { verifyToken } from "../middleware/authMiddleware.js";
+import { verifyAccessToken } from "../middleware/authMiddleware.js";
 
 const userRoutes = {
   "/api/users": {
     GET: (req, res) => {
-      verifyToken(req, res, getUsersHandler);
+      verifyAccessToken(req, res, getUsersHandler);
     },
   },
   "/api/users/signup": {
@@ -21,11 +22,14 @@ const userRoutes = {
   },
   "/api/users/:id": {
     GET: (req, res) => {
-      verifyToken(req, res, getUserByIdHandler);
+      verifyAccessToken(req, res, getUserByIdHandler);
     },
     DELETE: (req, res) => {
-      verifyToken(req, res, deleteUserByIdHandler);
+      verifyAccessToken(req, res, deleteUserByIdHandler);
     },
+  },
+  "/api/users/refresh": {
+    POST: refreshToken,
   },
   notFound: (req, res) => {
     res.statusCode = 404;
