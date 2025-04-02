@@ -5,6 +5,7 @@ import {
   userLoginHandler,
   deleteUserByIdHandler,
   refreshToken,
+  logoutHandler,
 } from "../controllers/userController.js";
 import { verifyAccessToken } from "../middleware/authMiddleware.js";
 
@@ -30,6 +31,11 @@ const userRoutes = {
   },
   "/api/users/refresh": {
     POST: refreshToken,
+  },
+  "/api/users/logout": {
+    POST: (req, res) => {
+      verifyAccessToken(req, res, logoutHandler);
+    },
   },
   notFound: (req, res) => {
     res.statusCode = 404;
