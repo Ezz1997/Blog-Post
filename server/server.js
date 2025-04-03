@@ -8,8 +8,9 @@ const whitelist = [process.env.HOST1];
 const headers = new Headers({
   "Access-Control-Allow-Origin": whitelist,
   "Access-Control-Allow-Methods": "OPTIONS, GET, POST, DELETE, PUT, PATCH",
-  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
   "Access-Control-Max-Age": 864000, // 10 days in seconds
+  "Access-Control-Allow-Credentials": "true",
 });
 
 // Json middleware
