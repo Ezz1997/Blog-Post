@@ -7,7 +7,7 @@ const REFRESH_URL = `${BASE_URL}:${PORT}/api/users/refresh`;
 
 const { fetch: originalFetch } = window;
 
-export async function apiFetch(resource, config = {}) {
+export async function apiFetch(resource, config = {}, setAccessToken = null) {
   console.log("Intercepted fetch for: ", resource);
 
   const authHeader = config.headers["Authorization"];
@@ -67,12 +67,7 @@ export async function apiFetch(resource, config = {}) {
       // Update the config with the NEW token obtained by the ongoing refresh
       config.headers.set("Authorization", `Bearer ${newToken}`);
 
-      // After a successful refresh, dispatch a custom event than AppContext listens to
-      window.dispatchEvent(
-        new CustomEvent("tokenRefreshed", {
-          detail: { accessToken: newToken },
-        })
-      );
+      setAccessToken(newToken);
 
       const retryRes = await originalFetch(resource, config);
       return retryRes;

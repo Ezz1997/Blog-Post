@@ -1,5 +1,4 @@
 import { createContext, useState, useEffect } from "react";
-import { apiFetch } from "../utils/interceptor";
 
 // Environment variables
 const BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -23,24 +22,6 @@ export const AppContextProvider = (props) => {
   };
 
   useEffect(() => {
-    // Listener for the custom event dispatched by the interceptor
-    const handleTokenRefreshed = (event) => {
-      const { accessToken: newToken } = event.detail;
-      console.log(
-        "AppContext: Detected token refresh via event. Updating token."
-      );
-      setAccessToken(newToken);
-    };
-
-    window.addEventListener("tokenRefreshed", handleTokenRefreshed);
-
-    // Cleanup listener on unmount
-    return () => {
-      window.removeEventListener("tokenRefreshed", handleTokenRefreshed);
-    };
-  }, []);
-
-  useEffect(() => {
     console.log("Access Token: ", accessToken);
   }, [accessToken]);
 
@@ -48,7 +29,7 @@ export const AppContextProvider = (props) => {
     let isMounted = true; // Prevent state update if component unmounts during fetch
     setIsLoading(true); // Ensure loading is true when effect runs
 
-    apiFetch(REFRESH_URL, {
+    fetch(REFRESH_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
