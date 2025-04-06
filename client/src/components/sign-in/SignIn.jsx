@@ -137,7 +137,7 @@ function SignIn() {
     dispatch({ type: ACTION_TYPES.POST_START });
 
     try {
-      const res = await apiFetch(`${BASE_URL}:${PORT}/api/users/login`, {
+      const res = await fetch(`${BASE_URL}:${PORT}/api/users/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
