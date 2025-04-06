@@ -50,7 +50,7 @@ function MainLayout() {
             <Routes>
               {/* Protected Routes - User needs to be logged in*/}
               <Route element={<ProtectedRoute />}>
-                <Route index element={<Test />} />
+                <Route index element={<Homepage />} />
                 <Route path="/blog-post" element={<BlogPost />} />
                 <Route path="/test" element={<Test />} />
               </Route>
