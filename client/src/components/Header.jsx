@@ -5,35 +5,26 @@ import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import Menu from "@mui/material/Menu";
-import MenuIcon from "@mui/icons-material/Menu";
 import Container from "@mui/material/Container";
 import Avatar from "@mui/material/Avatar";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import PostAddIcon from "@mui/icons-material/PostAdd";
 import { Link } from "react-router";
 import logo from "../assets/logo.png";
 import { AppContext } from "../context/AppContext";
 import SearchBar from "../components/SearchBar";
 import SearchIcon from "@mui/icons-material/Search";
+import postIcon from "../assets/postIcon.png";
 
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 function Header() {
-  const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
 
   const { accessToken } = useContext(AppContext);
 
-  const handleOpenNavMenu = (event) => {
-    setAnchorElNav(event.currentTarget);
-  };
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
-  };
-
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
   };
 
   const handleCloseUserMenu = () => {
@@ -90,20 +81,20 @@ function Header() {
             component={Link}
             to={accessToken ? "/new-post" : null}
           >
-            <PostAddIcon
-              fontSize="medium"
-              sx={{
-                mt: 1,
-                mr: 0.5,
-                display: "flex",
-              }}
-            />
             <Typography
-              sx={{ mt: 0.5, fontFamily: "monospace", fontWeight: 700 }}
+              sx={{ mt: 1.8, fontFamily: "monospace", fontWeight: 700 }}
               variant="h6"
             >
               Write
             </Typography>
+            <IconButton
+              sx={{
+                fontFamily: "monospace",
+                ml: -1.5,
+              }}
+            >
+              <Avatar alt="Logo" src={postIcon} />
+            </IconButton>
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
