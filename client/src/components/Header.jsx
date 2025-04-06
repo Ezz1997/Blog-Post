@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -8,19 +8,22 @@ import Menu from "@mui/material/Menu";
 import MenuIcon from "@mui/icons-material/Menu";
 import Container from "@mui/material/Container";
 import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import AdbIcon from "@mui/icons-material/Adb";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import { Link } from "react-router";
+import logo from "../assets/logo.png";
+import { AppContext } from "../context/AppContext";
+import SearchBar from "../components/SearchBar";
+import SearchIcon from "@mui/icons-material/Search";
 
-const pages = ["Products", "Pricing", "Blog"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 function Header() {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
+
+  const { accessToken } = useContext(AppContext);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -41,93 +44,41 @@ function Header() {
     <AppBar position="static" sx={{ backgroundColor: "#222831" }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
-          <Typography
-            variant="h6"
-            noWrap
-            component={Link}
-            to="/"
-            sx={{
-              mr: 2,
-              display: { xs: "none", md: "flex" },
-              fontFamily: "monospace",
-              fontWeight: 700,
-              letterSpacing: ".3rem",
-              color: "inherit",
-              textDecoration: "none",
-            }}
-          >
-            LOGO
-          </Typography>
-
-          <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
+          <Box sx={{ flexGrow: 1, display: "flex" }}>
             <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleOpenNavMenu}
-              color="inherit"
+              sx={{
+                display: "flex",
+                fontFamily: "monospace",
+              }}
+              component={Link}
+              to={accessToken ? "/" : null}
             >
-              <MenuIcon />
+              <Avatar alt="Logo" src={logo} />
             </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorElNav}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "left",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "left",
-              }}
-              open={Boolean(anchorElNav)}
-              onClose={handleCloseNavMenu}
-              sx={{ display: { xs: "block", md: "none" } }}
+            <Box
+              sx={{ flexGrow: 1, display: { xs: "none", md: "flex" }, mt: 1 }}
             >
-              {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography sx={{ textAlign: "center" }}>{page}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
-          <AdbIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
-          <Typography
-            variant="h5"
-            noWrap
-            component={Link}
-            to="/"
-            sx={{
-              mr: 2,
-              display: { xs: "flex", md: "none" },
-              flexGrow: 1,
-              fontFamily: "monospace",
-              fontWeight: 700,
-              letterSpacing: ".3rem",
-              color: "inherit",
-              textDecoration: "none",
-            }}
-          >
-            LOGO
-          </Typography>
-
-          <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-            {pages.map((page) => (
-              <Button
-                key={page}
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: "white", display: "block" }}
-              >
-                {page}
-              </Button>
-            ))}
+              <SearchBar />
+            </Box>
           </Box>
           <Box
             sx={{
-              display: { xs: "none", md: "flex" },
+              mr: 1,
+              display: { xs: "flex", md: "none" },
+            }}
+          >
+            <IconButton
+              type="button"
+              aria-label="search"
+              onClick={() => console.log("Oh my god I've been clicked!")}
+            >
+              <SearchIcon sx={{ color: "white" }} />
+            </IconButton>{" "}
+          </Box>
+
+          <Box
+            sx={{
+              display: "flex",
               color: "inherit",
               textDecoration: "none",
               flexDirection: "row",
@@ -137,7 +88,7 @@ function Header() {
               transform: "translate(-50%, -50%)",
             }}
             component={Link}
-            to="/new-post"
+            to={accessToken ? "/new-post" : null}
           >
             <PostAddIcon
               fontSize="medium"
