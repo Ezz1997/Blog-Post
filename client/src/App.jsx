@@ -1,9 +1,8 @@
+import { lazy } from "react";
+
 import Header from "./components/Header";
-import BlogPost from "./components/BlogPost";
 import Footer from "./components/Footer";
 import Homepage from "./components/Homepage";
-import Error from "./components/Error";
-import NewPost from "./components/NewPost";
 import "./App.css";
 import {
   BrowserRouter as Router,
@@ -13,14 +12,21 @@ import {
 } from "react-router";
 import "./styles.css";
 import SignIn from "./components/sign-in/SignIn";
-import ForgotPassword from "./components/sign-in/ForgotPassword";
-import SignUp from "./components/sign-in/SignUp";
 import PublicRoute from "./components/PublicRoute";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Test from "./components/Test";
 import { AppContext } from "./context/AppContext";
 import { useContext } from "react";
 import { CircularProgress } from "@mui/material";
+
+// Lazy loaded components
+const BlogPost = lazy(() => import("./components/BlogPost.jsx"));
+const NewPost = lazy(() => import("./components/NewPost.jsx"));
+const SignUp = lazy(() => import("./components/sign-in/SignUp.jsx"));
+const ForgotPassword = lazy(
+  () => import("./components/sign-in/ForgotPassword.jsx")
+);
+const Error = lazy(() => import("./components/Error.jsx"));
 
 function MainLayout() {
   const location = useLocation();
