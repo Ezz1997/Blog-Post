@@ -33,9 +33,7 @@ const userRoutes = {
     POST: refreshToken,
   },
   "/api/users/logout": {
-    POST: (req, res) => {
-      verifyAccessToken(req, res, logoutHandler);
-    },
+    POST: logoutHandler,
   },
   notFound: (req, res) => {
     res.statusCode = 404;
