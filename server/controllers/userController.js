@@ -16,7 +16,6 @@ const getUsersHandler = async (req, res) => {
     .find()
     .project({ password: 0, refreshToken: 0 })
     .toArray();
-  // console.log(users);
 
   try {
     res.statusCode = 200;
@@ -175,16 +174,23 @@ const userLoginHandler = async (req, res) => {
           };
 
           // update document with the specific id
-          const updated_res = await coll.updateOne(filter, updateDoc);
+          await coll.updateOne(filter, updateDoc);
 
-          console.log(updated_res.modifiedCount);
-
+          // Set the Refresh Token Cookie
+          const cookieOptions = [
+            `refreshToken=${refreshToken}`,
+            `HttpOnly`, // Makes it inaccessiable to client-side JS
+            `Secure`, // Ensures cookie is sent over https
+            `Path=/`,
+            `Max-Age=${60}`,
+            `SameSite=Strict`,
+          ];
+          res.setHeader("Set-Cookie", cookieOptions.join("; "));
           res.statusCode = 200;
           res.end(
             JSON.stringify({
-              login: true,
+              message: "Login successful",
               accessToken: accessToken,
-              refreshToken: refreshToken,
             })
           );
           return;
@@ -238,33 +244,39 @@ const deleteUserByIdHandler = async (req, res) => {
 };
 
 const refreshToken = async (req, res) => {
-  let body = "";
+  try {
+    const cookie = req.headers?.cookie;
 
-  req.on("data", (chunk) => {
-    body += chunk;
-  });
+    // cookie isn't in the headers
+    if (!cookie) {
+      res.statusCode = 401;
+      res.end(JSON.stringify({ error: "Not Authenticated" }));
+      return;
+    }
 
-  req.on("end", async () => {
-    try {
-      if (!body) {
-        res.statusCode = 400;
-        res.end(JSON.stringify({ error: "Invalid request" }));
-        return;
-      }
+    // Take the refresh token from the user
+    const refreshToken = cookie.split("refreshToken=")[1];
 
-      const data = JSON.parse(body);
+    // Token isn't in the request body
+    if (!refreshToken) {
+      res.statusCode = 401;
+      res.end(JSON.stringify({ error: "Not Authenticated" }));
+      return;
+    }
 
-      // Take the refresh token from the user
-      const refreshToken = data.refreshToken;
-
-      // Token isn't in the request body
-      if (!refreshToken) {
+    jwt.verify(refreshToken, JWT_REFRESH_SECRET, async (err, user) => {
+      if (err) {
+        console.log(err);
         res.statusCode = 401;
-        res.end(JSON.stringify({ error: "Not Authenticated" }));
+
+        let errorMessage = "Unauthorized. Invalid token.";
+        if (err instanceof jwt.TokenExpiredError) {
+          errorMessage = "Unathorized. Token expired";
+        }
+        res.end(JSON.stringify({ error: errorMessage }));
         return;
       }
 
-      // Check if token is in db
       const users = db.collection("users");
       const user_with_token = await users.findOne({ refreshToken });
 
@@ -275,130 +287,92 @@ const refreshToken = async (req, res) => {
         return;
       }
 
-      jwt.verify(refreshToken, JWT_REFRESH_SECRET, async (err, user) => {
-        if (err) {
-          console.log(err);
-          res.statusCode = 401;
+      const newAccessToken = generateAccessToken(user);
 
-          let errorMessage = "Unauthorized. Invalid token.";
-          if (err instanceof jwt.TokenExpiredError) {
-            errorMessage = "Unathorized. Token expired";
-          }
-          res.end(JSON.stringify({ error: errorMessage }));
-          return;
-        }
-
-        const newAccessToken = generateAccessToken(user);
-        const newRefreshToken = generateRefreshToken(user);
-
-        // Update refresh token in db
-        const filter = { _id: ObjectId.createFromHexString(user._id) };
-
-        // Specify the update to set a value for the plot field
-        const updateDoc = {
-          $set: {
-            refreshToken: newRefreshToken,
-          },
-        };
-
-        console.log(user._id);
-
-        // update document with the specific id
-        const updated_res = await users.updateOne(filter, updateDoc);
-
-        console.log(updated_res.modifiedCount);
-
-        res.statusCode = 200;
-        res.end(
-          JSON.stringify({
-            accessToken: newAccessToken,
-            refreshToken: newRefreshToken,
-          })
-        );
-      });
-    } catch (error) {
-      console.error(error);
-      res.statusCode = 500;
-      res.end(JSON.stringify({ error: "Internal Server Error" }));
-    }
-  });
+      res.statusCode = 200;
+      res.end(
+        JSON.stringify({
+          accessToken: newAccessToken,
+        })
+      );
+    });
+  } catch (error) {
+    console.error(error);
+    res.statusCode = 500;
+    res.end(JSON.stringify({ error: "Internal Server Error" }));
+  }
 };
 
-const logoutHandler = (req, res) => {
-  let body = "";
+const logoutHandler = async (req, res) => {
+  try {
+    const cookie = req.headers?.cookie;
 
-  req.on("data", (chunk) => {
-    body += chunk;
-  });
-
-  req.on("end", async () => {
-    try {
-      if (!body) {
-        res.statusCode = 400;
-        res.end(JSON.stringify({ error: "Invalid request" }));
-        return;
-      }
-
-      const data = JSON.parse(body);
-
-      // Take the refresh token from the user
-      const refreshToken = data.refreshToken;
-
-      // Token isn't in the request body
-      if (!refreshToken) {
-        res.statusCode = 401;
-        res.end(JSON.stringify({ error: "Not Authenticated" }));
-        return;
-      }
-
-      // Check if token is in db
-      const users = db.collection("users");
-      const user_with_token = await users.findOne({ refreshToken });
-
-      // Send error if token isn't in the db
-      if (!user_with_token) {
-        res.statusCode = 403;
-        res.end(JSON.stringify({ error: "Refresh token is not valid" }));
-        return;
-      }
-
-      jwt.verify(refreshToken, JWT_REFRESH_SECRET, async (err, user) => {
-        if (err) {
-          console.log(err);
-          res.statusCode = 401;
-
-          let errorMessage = "Unauthorized. Invalid token.";
-          if (err instanceof jwt.TokenExpiredError) {
-            errorMessage = "Unathorized. Token expired";
-          }
-          res.end(JSON.stringify({ error: errorMessage }));
-          return;
-        }
-
-        // Update refresh token in db
-        const filter = { _id: ObjectId.createFromHexString(user._id) };
-
-        // Specify the update to set a value for the plot field
-        const updateDoc = {
-          $set: {
-            refreshToken: null,
-          },
-        };
-
-        // update document with the specific id
-        const updated_res = await users.updateOne(filter, updateDoc);
-
-        console.log(updated_res.modifiedCount);
-
-        res.statusCode = 200;
-        res.end(JSON.stringify({ message: "User logged out successfully!" }));
-      });
-    } catch (error) {
-      console.error(error);
-      res.statusCode = 500;
-      res.end(JSON.stringify({ error: "Internal Server Error" }));
+    // cookie isn't in the headers
+    if (!cookie) {
+      res.statusCode = 401;
+      res.end(JSON.stringify({ error: "Not Authenticated" }));
+      return;
     }
-  });
+
+    // Take the refresh token from the user
+    const refreshToken = cookie.split("refreshToken=")[1];
+
+    // Token isn't in the request body
+    if (!refreshToken) {
+      res.statusCode = 401;
+      res.end(JSON.stringify({ error: "Not Authenticated" }));
+      return;
+    }
+
+    jwt.verify(refreshToken, JWT_REFRESH_SECRET, async (err, user) => {
+      if (err) {
+        console.log(err);
+        res.statusCode = 401;
+
+        let errorMessage = "Unauthorized. Invalid token.";
+        if (err instanceof jwt.TokenExpiredError) {
+          errorMessage = "Unathorized. Token expired";
+        }
+        res.end(JSON.stringify({ error: errorMessage }));
+        return;
+      }
+
+      const users = db.collection("users");
+
+      // Update refresh token in db
+      const filter = { _id: ObjectId.createFromHexString(user._id) };
+
+      // Specify the update to set a value for the plot field
+      const updateDoc = {
+        $set: {
+          refreshToken: null,
+        },
+      };
+
+      // update document with the specific id
+      const updated_res = await users.updateOne(filter, updateDoc);
+
+      console.log(updated_res.modifiedCount);
+
+      // Set the Refresh Token Cookie with Max-Age 0
+      const cookieOptions = [
+        `refreshToken=${refreshToken}`,
+        `HttpOnly`, // Makes it inaccessiable to client-side JS
+        `Secure`, // Ensures cookie is sent over https
+        `Path=/`,
+        `Max-Age=${0}`,
+        `SameSite=Strict`,
+      ];
+      res.setHeader("Set-Cookie", cookieOptions.join("; "));
+
+      res.statusCode = 200;
+      res.end(JSON.stringify({ message: "User logged out successfully!" }));
+    });
+  } catch (error) {
+    console.error(error);
+    res.statusCode = 500;
+    res.end(JSON.stringify({ error: "Internal Server Error" }));
+  }
 };
 
 export {
