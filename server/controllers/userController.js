@@ -182,7 +182,7 @@ const userLoginHandler = async (req, res) => {
             `HttpOnly`, // Makes it inaccessiable to client-side JS
             `Secure`, // Ensures cookie is sent over https
             `Path=/`,
-            `Max-Age=${60}`,
+            `Max-Age=${60 * 60 * 24}`, // 24 hours
             `SameSite=Strict`,
           ];
           res.setHeader("Set-Cookie", cookieOptions.join("; "));
