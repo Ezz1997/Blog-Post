@@ -42,7 +42,7 @@ export const verifyAccessToken = (req, res, next) => {
 
     let errorMessage = "Unauthorized. Invalid token.";
     if (err instanceof jwt.TokenExpiredError) {
-      errorMessage = "Unathorized. Token expired";
+      errorMessage = "Unathorized. Access Token expired";
     }
 
     res.statusCode = 401;
