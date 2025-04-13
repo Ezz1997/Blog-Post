@@ -21,7 +21,7 @@ import { CircularProgress } from "@mui/material";
 
 // Lazy loaded components
 const BlogPost = lazy(() => import("./components/BlogPost.jsx"));
-const NewPost = lazy(() => import("./components/NewPost.jsx"));
+const PostEditor = lazy(() => import("./components/PostEditor.jsx"));
 const SignUp = lazy(() => import("./components/sign-in/SignUp.jsx"));
 const ForgotPassword = lazy(
   () => import("./components/sign-in/ForgotPassword.jsx")
@@ -29,17 +29,16 @@ const ForgotPassword = lazy(
 const Error = lazy(() => import("./components/Error.jsx"));
 
 function MainLayout() {
-  const location = useLocation();
+  // const location = useLocation();
 
-  let mainClassName =
-    location.pathname === "/new-post" ? "grid-container" : "flex-container";
+  // let mainClassName =
+  //   location.pathname === "/new-post" ? "grid-container" : "flex-container";
 
   const { isLoading } = useContext(AppContext);
 
   return (
     <>
       <Header />
-      {/* Render <main> for all pages except new-post */}
       {isLoading ? (
         <div
           style={{
@@ -52,13 +51,13 @@ function MainLayout() {
           <CircularProgress />
         </div>
       ) : (
-        <main className={mainClassName}>
+        <main className="flex-container">
           <Routes>
             {/* Protected Routes - User needs to be logged in*/}
             <Route element={<ProtectedRoute />}>
               <Route index element={<Homepage />} />
               <Route path="/blog-post" element={<BlogPost />} />
-              <Route path="/new-post" element={<NewPost />} />
+              <Route path="/post-editor" element={<PostEditor />} />
               <Route path="/test" element={<Test />} />
             </Route>
 

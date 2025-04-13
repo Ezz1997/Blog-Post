@@ -44,7 +44,7 @@ body {
     text-align: right;
   }
   
-  .editor-container {
+  /* .editor-container {
     margin: 20px auto 20px auto;
     border-radius: 2px;
     max-width: 600px;
@@ -55,7 +55,7 @@ body {
     text-align: left;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
-  }
+  } */
   
   .editor-inner {
     background: #fff;
@@ -355,6 +355,7 @@ body {
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     vertical-align: middle;
+    flex-wrap: wrap;
   }
   
   .toolbar button.toolbar-item {

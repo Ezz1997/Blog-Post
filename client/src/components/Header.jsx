@@ -131,7 +131,7 @@ function Header() {
               transform: "translate(-50%, -50%)",
             }}
             component={Link}
-            to={accessToken ? "/new-post" : null}
+            to={accessToken ? "/post-editor" : null}
           >
             <Typography
               sx={{ mt: 1.8, fontFamily: "monospace", fontWeight: 700 }}

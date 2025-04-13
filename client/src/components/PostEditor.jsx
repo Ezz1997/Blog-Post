@@ -22,6 +22,7 @@ import AutoLinkPlugin from "../plugins/AutoLinkPlugin";
 
 import { LexicalToHtml } from "./LexicalToHtml";
 import { OnChangePlugin } from "../plugins/OnChangePlugin";
+import { Container } from "@mui/material";
 
 function Placeholder() {
   return <div className="editor-placeholder">Enter some rich text...</div>;
@@ -53,7 +54,7 @@ const editorConfig = {
 export default function PostEditor() {
   return (
     <LexicalComposer initialConfig={editorConfig}>
-      <div className="editor-container">
+      <Container maxWidth="md" sx={{ mt: "2vh", mb: "2vh" }}>
         <ToolbarPlugin />
         <div className="editor-inner">
           <RichTextPlugin
@@ -72,7 +73,7 @@ export default function PostEditor() {
           <OnChangePlugin />
           <LexicalToHtml />
         </div>
-      </div>
+      </Container>
     </LexicalComposer>
   );
 }

@@ -35,7 +35,7 @@ import {
   getDefaultCodeLanguage,
   getCodeLanguages,
 } from "@lexical/code";
-import { Divider, IconButton } from "@mui/material";
+import { Divider, IconButton, Stack } from "@mui/material";
 import {
   AutoFixHigh,
   CodeOutlined,
@@ -524,7 +524,12 @@ export default function ToolbarPlugin() {
   }, [editor, isLink]);
 
   return (
-    <div className="toolbar" ref={toolbarRef}>
+    <Stack
+      className="toolbar"
+      ref={toolbarRef}
+      direction="row"
+      justifyContent={{ sm: "space-between" }}
+    >
       {supportedBlockTypes.has(blockType) && (
         <>
           <button
@@ -653,6 +658,6 @@ export default function ToolbarPlugin() {
           </IconButton>
         </>
       )}
-    </div>
+    </Stack>
   );
 }
