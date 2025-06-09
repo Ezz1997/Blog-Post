@@ -3,10 +3,10 @@ import { Navigate, Outlet } from "react-router";
 import { AppContext } from "../context/AppContext";
 
 const ProtectedRoute = () => {
-  const { accessToken } = useContext(AppContext);
+  const { isLoggedin } = useContext(AppContext);
 
   // If the user IS NOT logged in, redirect them to the login page.
-  return accessToken ? <Outlet /> : <Navigate to="/login" replace />;
+  return isLoggedin ? <Outlet /> : <Navigate to="/login" replace />;
 };
 
 export default ProtectedRoute;

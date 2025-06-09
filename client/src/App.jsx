@@ -34,11 +34,11 @@ function MainLayout() {
   // let mainClassName =
   //   location.pathname === "/new-post" ? "grid-container" : "flex-container";
 
-  const { isLoading } = useContext(AppContext);
+  const { isLoading, isLoggedin } = useContext(AppContext);
 
   return (
     <>
-      <Header />
+      {isLoggedin && <Header />}
       {isLoading ? (
         <div
           style={{
@@ -74,7 +74,7 @@ function MainLayout() {
         </main>
       )}
 
-      <Footer />
+      {isLoggedin && <Footer />}
     </>
   );
 }

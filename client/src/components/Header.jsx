@@ -9,7 +9,7 @@ import Container from "@mui/material/Container";
 import Avatar from "@mui/material/Avatar";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 import logo from "../assets/logo.png";
 import { AppContext } from "../context/AppContext";
 import SearchBar from "../components/SearchBar";
@@ -25,9 +25,7 @@ const LOGOUT_URL = `${BASE_URL}:${PORT}/api/users/logout`;
 function Header() {
   const [anchorElUser, setAnchorElUser] = useState(null);
 
-  const { accessToken, setAccessToken } = useContext(AppContext);
-
-  const navigate = useNavigate();
+  const { setAccessToken, isLoggedin, setIsLoggedin } = useContext(AppContext);
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -68,7 +66,7 @@ function Header() {
           // Handle HTTP errors (like 401 Unauthorized)
           if (res.status === 401) {
             setAccessToken(null);
-            navigate("/login");
+            setIsLoggedin(false);
           }
           throw new Error(`HTTP error! status: ${res.status}`);
         }
@@ -78,7 +76,7 @@ function Header() {
       .then((data) => {
         console.log(data);
         setAccessToken(null);
-        navigate("/login");
+        setIsLoggedin(false);
       })
       .catch((err) => console.error(err));
   };
@@ -94,7 +92,7 @@ function Header() {
                 fontFamily: "monospace",
               }}
               component={Link}
-              to={accessToken ? "/" : null}
+              to={isLoggedin ? "/" : null}
             >
               <Avatar alt="Logo" src={logo} />
             </IconButton>
@@ -131,7 +129,7 @@ function Header() {
               transform: "translate(-50%, -50%)",
             }}
             component={Link}
-            to={accessToken ? "/post-editor" : null}
+            to={isLoggedin ? "/post-editor" : null}
           >
             <Typography
               sx={{ mt: 1.8, fontFamily: "monospace", fontWeight: 700 }}
@@ -149,43 +147,41 @@ function Header() {
             </IconButton>
           </Box>
 
-          {accessToken && (
-            <Box sx={{ flexGrow: 0 }}>
-              <Tooltip title="Open settings">
-                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-                </IconButton>
-              </Tooltip>
-              <Menu
-                disableScrollLock={true}
-                sx={{ mt: "45px" }}
-                id="menu-appbar"
-                anchorEl={anchorElUser}
-                anchorOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-                open={Boolean(anchorElUser)}
-                onClose={handleCloseUserMenu}
-              >
-                {settings.map((setting) => (
-                  <MenuItem
-                    key={setting}
-                    onClick={() => handleMenuItemClick(setting)}
-                  >
-                    <Typography sx={{ textAlign: "center" }}>
-                      {setting}
-                    </Typography>
-                  </MenuItem>
-                ))}
-              </Menu>
-            </Box>
-          )}
+          <Box sx={{ flexGrow: 0 }}>
+            <Tooltip title="Open settings">
+              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+              </IconButton>
+            </Tooltip>
+            <Menu
+              disableScrollLock={true}
+              sx={{ mt: "45px" }}
+              id="menu-appbar"
+              anchorEl={anchorElUser}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              open={Boolean(anchorElUser)}
+              onClose={handleCloseUserMenu}
+            >
+              {settings.map((setting) => (
+                <MenuItem
+                  key={setting}
+                  onClick={() => handleMenuItemClick(setting)}
+                >
+                  <Typography sx={{ textAlign: "center" }}>
+                    {setting}
+                  </Typography>
+                </MenuItem>
+              ))}
+            </Menu>
+          </Box>
         </Toolbar>
       </Container>
     </AppBar>

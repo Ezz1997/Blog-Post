@@ -14,16 +14,14 @@ import {
 } from "@mui/material";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import { createTheme } from "@mui/material";
-import { Link as RouterLink, useNavigate } from "react-router";
-import { useState, useReducer, useEffect, useContext } from "react";
+import { Link as RouterLink } from "react-router";
+import { useState, useReducer, useContext } from "react";
 import CustomPasswordField from "./CustomPasswordField";
 import { validateEmail, validatePassword } from "./ValidationFunctions";
 
 import { INITIAL_STATE, postReducer } from "./postReducer";
 import { ACTION_TYPES } from "./postActionTypes";
 import { AppContext } from "../../context/AppContext";
-
-import { apiFetch } from "../../utils/interceptor";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 const PORT = import.meta.env.VITE_PORT;
@@ -91,7 +89,7 @@ function SignIn() {
   const [message, setMessage] = useState("");
   const [state, dispatch] = useReducer(postReducer, INITIAL_STATE);
 
-  const { setAccessToken } = useContext(AppContext);
+  const { setAccessToken, setIsLoggedin } = useContext(AppContext);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -102,8 +100,6 @@ function SignIn() {
     email: true,
     password: true,
   });
-
-  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -158,8 +154,8 @@ function SignIn() {
       if (data.message === "Login successful" && data.accessToken) {
         console.log(data);
         setAccessToken(data.accessToken);
+        setIsLoggedin(true);
         dispatch({ type: ACTION_TYPES.POST_SUCCESS });
-        navigate("/");
       }
     } catch (err) {
       setMessage(typeof err === "string" ? err : "");

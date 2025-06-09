@@ -11,6 +11,7 @@ export const AppContextProvider = (props) => {
   const [accessToken, setAccessToken] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [userData, setUserData] = useState(false);
+  const [isLoggedin, setIsLoggedin] = useState(false);
 
   const value = {
     userData,
@@ -19,6 +20,8 @@ export const AppContextProvider = (props) => {
     setAccessToken,
     isLoading,
     setIsLoading,
+    isLoggedin,
+    setIsLoggedin,
   };
 
   useEffect(() => {
@@ -48,8 +51,10 @@ export const AppContextProvider = (props) => {
           if (!data.error && data.accessToken) {
             // Check specifically for accessToken
             setAccessToken(data.accessToken);
+            setIsLoggedin(true);
           } else {
             setAccessToken(null); // Set explicitly to null on error or missing token
+            setIsLoggedin(false);
           }
         }
       })
@@ -57,6 +62,7 @@ export const AppContextProvider = (props) => {
         if (isMounted) {
           console.error("Refresh error:", err);
           setAccessToken(null); // Clear token on any fetch error
+          setIsLoggedin(false);
         }
       })
       .finally(() => {
