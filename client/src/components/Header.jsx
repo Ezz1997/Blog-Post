@@ -9,14 +9,14 @@ import Container from "@mui/material/Container";
 import Avatar from "@mui/material/Avatar";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import logo from "../assets/logo.png";
 import { AppContext } from "../context/AppContext";
 import SearchBar from "../components/SearchBar";
 import SearchIcon from "@mui/icons-material/Search";
 import postIcon from "../assets/postIcon.png";
 
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
+const settings = ["Display Post", "Profile", "Account", "Dashboard", "Logout"];
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 const PORT = import.meta.env.VITE_PORT;
@@ -26,6 +26,8 @@ function Header() {
   const [anchorElUser, setAnchorElUser] = useState(null);
 
   const { setAccessToken, isLoggedin, setIsLoggedin } = useContext(AppContext);
+
+  const navigate = useNavigate();
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -51,6 +53,8 @@ function Header() {
       case "Logout":
         logout();
         break;
+      case "Display Post":
+        navigate("/test2");
       default:
         break;
     }

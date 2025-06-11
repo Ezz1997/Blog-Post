@@ -12,6 +12,7 @@ export const AppContextProvider = (props) => {
   const [isLoading, setIsLoading] = useState(true);
   const [userData, setUserData] = useState(false);
   const [isLoggedin, setIsLoggedin] = useState(false);
+  const [userPost, setUserPost] = useState(null);
 
   const value = {
     userData,
@@ -22,6 +23,8 @@ export const AppContextProvider = (props) => {
     setIsLoading,
     isLoggedin,
     setIsLoggedin,
+    userPost,
+    setUserPost,
   };
 
   useEffect(() => {

@@ -1,22 +1,17 @@
-import { lazy } from "react";
+import { lazy, useContext } from "react";
 
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Homepage from "./components/Homepage";
 import "./App.css";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  useLocation,
-} from "react-router";
+import { BrowserRouter as Router, Routes, Route } from "react-router";
 import "./styles.css";
 import SignIn from "./components/sign-in/SignIn";
 import PublicRoute from "./components/PublicRoute";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Test from "./components/Test";
+import TestPostDisplay from "./components/TestPostDisplay.jsx";
 import { AppContext } from "./context/AppContext";
-import { useContext } from "react";
 import { CircularProgress } from "@mui/material";
 
 // Lazy loaded components
@@ -29,11 +24,6 @@ const ForgotPassword = lazy(
 const Error = lazy(() => import("./components/Error.jsx"));
 
 function MainLayout() {
-  // const location = useLocation();
-
-  // let mainClassName =
-  //   location.pathname === "/new-post" ? "grid-container" : "flex-container";
-
   const { isLoading, isLoggedin } = useContext(AppContext);
 
   return (
@@ -59,6 +49,7 @@ function MainLayout() {
               <Route path="/blog-post" element={<BlogPost />} />
               <Route path="/post-editor" element={<PostEditor />} />
               <Route path="/test" element={<Test />} />
+              <Route path="/test2" element={<TestPostDisplay />} />
             </Route>
 
             {/* Public Routes - User not logged in only*/}
