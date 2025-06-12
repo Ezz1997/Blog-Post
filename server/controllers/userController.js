@@ -142,10 +142,10 @@ const userLoginHandler = async (req, res) => {
 
       // Parse Json
       let user = JSON.parse(body);
-      const { email, password } = user;
+      const { email, password, rememberMe } = user;
 
       // Validate input
-      if (!email || !password) {
+      if (!email || !password || !typeof rememberMe == "boolean") {
         res.statusCode = 400;
         res.end(
           JSON.stringify({ login: false, error: "All fields are required" })
@@ -182,7 +182,7 @@ const userLoginHandler = async (req, res) => {
             `HttpOnly`, // Makes it inaccessiable to client-side JS
             `Secure`, // Ensures cookie is sent over https
             `Path=/`,
-            `Max-Age=${60 * 60 * 24}`, // 24 hours
+            `Max-Age=${rememberMe ? 60 * 60 * 24 : 60 * 60 * 6}`,
             `SameSite=Strict`,
           ];
           res.setHeader("Set-Cookie", cookieOptions.join("; "));
