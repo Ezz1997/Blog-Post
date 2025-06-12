@@ -63,7 +63,11 @@ const theme = createTheme({
   },
 });
 
-function RememberMe() {
+function RememberMe({ rememberMe, setRememberMe }) {
+  const handleChange = (event) => {
+    setRememberMe(event.target.checked);
+  };
+
   return (
     <FormControlLabel
       control={
@@ -72,6 +76,8 @@ function RememberMe() {
           value="true"
           color="primary"
           sx={{ padding: 0.5, "& .MuiSvgIcon-root": { fontSize: 20 } }}
+          checked={rememberMe}
+          onChange={handleChange}
         />
       }
       slotProps={{
@@ -86,6 +92,7 @@ function RememberMe() {
 }
 
 function SignIn() {
+  const [rememberMe, setRememberMe] = useState(true);
   const [message, setMessage] = useState("");
   const [state, dispatch] = useReducer(postReducer, INITIAL_STATE);
 
@@ -141,6 +148,7 @@ function SignIn() {
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
+          rememberMe: rememberMe,
         }),
         credentials: "include",
       });
@@ -233,7 +241,10 @@ function SignIn() {
               sx={{ width: "85%" }}
               justifyContent="space-between"
             >
-              <RememberMe />
+              <RememberMe
+                rememberMe={rememberMe}
+                setRememberMe={setRememberMe}
+              />
               <Link to="/forgot-password" component={RouterLink} align="right">
                 Forgot password?
               </Link>
