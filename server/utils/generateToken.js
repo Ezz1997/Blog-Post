@@ -8,9 +8,13 @@ const ACCESS_TOKEN_EXPIRATION = 60 * 15;
 const REFRESH_TOKEN_EXPIRATION = 60 * 60 * 24;
 
 export const generateAccessToken = (user) => {
-  return jwt.sign({ _id: user._id }, JWT_ACCESS_SECRET, {
-    expiresIn: ACCESS_TOKEN_EXPIRATION, // 15 minutes
-  });
+  return jwt.sign(
+    { _id: user._id, firstname: user.firstname, lastname: user.lastname },
+    JWT_ACCESS_SECRET,
+    {
+      expiresIn: ACCESS_TOKEN_EXPIRATION, // 15 minutes
+    }
+  );
 };
 
 export const generateRefreshToken = (user) => {
