@@ -25,7 +25,7 @@ import { OnChangePlugin } from "../plugins/OnChangePlugin";
 import { Container } from "@mui/material";
 
 function Placeholder() {
-  return <div className="editor-placeholder">Enter some rich text...</div>;
+  return <div className="editor-placeholder">Enter some text...</div>;
 }
 
 const editorConfig = {
@@ -33,7 +33,7 @@ const editorConfig = {
   theme: EditorTheme,
   // Handling of errors during update
   onError(error) {
-    console.log("Error: ", error);
+    console.error("Error: ", error);
   },
   // Any custom nodes go here
   nodes: [
