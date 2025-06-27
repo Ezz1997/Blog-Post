@@ -287,7 +287,7 @@ const refreshToken = async (req, res) => {
         return;
       }
 
-      const newAccessToken = generateAccessToken(user);
+      const newAccessToken = generateAccessToken(user_with_token);
 
       res.statusCode = 200;
       res.end(
