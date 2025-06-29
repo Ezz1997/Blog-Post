@@ -6,7 +6,17 @@ import {
   generateRefreshToken,
 } from "../utils/generateToken.js";
 import jwt from "jsonwebtoken";
+import validator from "validator";
+import {
+  sendErrorResponse,
+  sendSuccessResponse,
+} from "../utils/responseHelpers.js";
+
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
+const MAX_NAME_LENGTH = 50;
+const MAX_EMAIL_LENGTH = 254;
+const MAX_PASSWORD_LENGTH = 64;
+const MIN_PASSWORD_LENGTH = 8;
 
 // Route handler for GET /api/users
 // Get list of all users
@@ -77,11 +87,51 @@ const createUserHandler = (req, res) => {
       // Parse JSON
       const newUser = JSON.parse(body);
 
-      // Validate input
+      // Validate that all fields are present
       const { firstname, lastname, email, password } = newUser;
       if (!firstname || !lastname || !email || !password) {
-        res.statusCode = 400;
-        res.end(JSON.stringify({ error: "All fields are required" }));
+        sendErrorResponse(res, 400, "All fields are required");
+        return;
+      }
+
+      // Validate types
+      if (
+        typeof firstname !== "string" ||
+        typeof lastname != "string" ||
+        typeof email != "string" ||
+        typeof password != "string"
+      ) {
+        sendErrorResponse(res, 422, "Invalid data types");
+        return;
+      }
+
+      // Validate lengths
+      if (
+        firstname.length > MAX_NAME_LENGTH ||
+        lastname.length > MAX_NAME_LENGTH ||
+        email.length > MAX_EMAIL_LENGTH ||
+        !(
+          password.length >= MIN_PASSWORD_LENGTH &&
+          password.length <= MAX_PASSWORD_LENGTH
+        )
+      ) {
+        sendErrorResponse(res, 422, "Invalid data lengths");
+        return;
+      }
+
+      // Validate that first name and lastname contains only letters
+      if (!validator.isAlpha(firstname) || !validator.isAlpha(lastname)) {
+        sendErrorResponse(
+          res,
+          422,
+          "first name and last name must contain only letters"
+        );
+        return;
+      }
+
+      // Validate email
+      if (!validator.isEmail(email)) {
+        sendErrorResponse(res, 422, "Invalid Email");
         return;
       }
 
@@ -107,17 +157,14 @@ const createUserHandler = (req, res) => {
           });
         }
 
-        res.statusCode = 201;
-        res.end(JSON.stringify({ message: "User Created Successfully" }));
+        sendSuccessResponse(res, 201, "User Created Successfully");
       } else {
         // User already exists
-        res.statusCode = 409;
-        res.end(JSON.stringify({ error: "User Already exists!" }));
+        sendErrorResponse(res, 409, "User Already exists!");
       }
     } catch (error) {
       console.error(error);
-      res.statusCode = 500;
-      res.end(JSON.stringify({ error: "Internal Server Error" }));
+      sendErrorResponse(res, 500, "Internal Server Error");
     }
   });
 };
