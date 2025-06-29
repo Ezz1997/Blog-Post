@@ -1,4 +1,5 @@
 const MAX_NAME_LENGTH = 50;
+const MAX_EMAIL_LENGTH = 254;
 
 // Validates that the name only contains characters
 export function validateName(value) {
@@ -13,8 +14,10 @@ export function validateName(value) {
 }
 
 export const validateEmail = (email) => {
-  return email.match(
-    /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  return (
+    email.match(
+      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    ) && email.length <= MAX_EMAIL_LENGTH
   );
 };
 
