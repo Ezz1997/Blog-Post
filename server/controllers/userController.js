@@ -135,27 +135,25 @@ const createUserHandler = (req, res) => {
         return;
       }
 
+      // Sanitize email
+      const safeEmail = validator.normalizeEmail(email);
+
+      console.log(safeEmail);
+
       const coll = db.collection("users");
 
       // Check if user exists
-      const existingUser = await coll.findOne({ email });
+      const existingUser = await coll.findOne({ safeEmail });
       if (!existingUser) {
         // Hash password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        if (newUser._id) {
-          await coll.insertOne({
-            ...newUser,
-            password: hashedPassword,
-            _id: ObjectId.createFromHexString(newUser._id),
-          });
-        } else {
-          await coll.insertOne({
-            ...newUser,
-            password: hashedPassword,
-          });
-        }
+        await coll.insertOne({
+          ...newUser,
+          email: safeEmail,
+          password: hashedPassword,
+        });
 
         sendSuccessResponse(res, 201, "User Created Successfully");
       } else {
