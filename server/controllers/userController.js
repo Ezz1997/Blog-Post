@@ -32,8 +32,7 @@ const getUsersHandler = async (req, res) => {
     res.end(JSON.stringify(users));
   } catch (error) {
     console.error(error);
-    res.statusCode = 500;
-    res.end(JSON.stringify({ error: "Internal Server Error" }));
+    sendErrorResponse(res, 500, "Internal Server Error");
   }
 };
 
@@ -45,8 +44,7 @@ const getUserByIdHandler = async (req, res) => {
     const coll = db.collection("users");
 
     if (!id.match(/([0-9a-fA-F]{24})/)) {
-      res.statusCode = 400;
-      res.end(JSON.stringify({ error: "Invalid User ID format" }));
+      sendErrorResponse(res, 400, "Invalid User ID format");
       return;
     }
 
@@ -62,13 +60,11 @@ const getUserByIdHandler = async (req, res) => {
       res.end(JSON.stringify(user));
     } else {
       console.log("User not found");
-      res.statusCode = 404;
-      res.end(JSON.stringify({ error: "User not found" }));
+      sendErrorResponse(res, 404, "User not found");
     }
   } catch (error) {
     console.error(error);
-    res.statusCode = 500;
-    res.end(JSON.stringify({ error: "Internal Server Error" }));
+    sendErrorResponse(res, 500, "Internal Server Error");
   }
 };
 
@@ -101,7 +97,7 @@ const createUserHandler = (req, res) => {
         typeof email != "string" ||
         typeof password != "string"
       ) {
-        sendErrorResponse(res, 422, "Invalid data types");
+        sendErrorResponse(res, 400, "Invalid data types");
         return;
       }
 
@@ -131,7 +127,7 @@ const createUserHandler = (req, res) => {
 
       // Validate email
       if (!validator.isEmail(email)) {
-        sendErrorResponse(res, 422, "Invalid Email");
+        sendErrorResponse(res, 400, "Invalid Email");
         return;
       }
 
@@ -246,8 +242,7 @@ const userLoginHandler = async (req, res) => {
       res.end(JSON.stringify({ login: false, error: "Unauthorized Access" }));
     } catch (error) {
       console.error(error);
-      res.statusCode = 500;
-      res.end(JSON.stringify({ error: "Internal Server Error" }));
+      sendErrorResponse(res, 500, "Internal Server Error");
     }
   });
 };
@@ -260,8 +255,7 @@ const deleteUserByIdHandler = async (req, res) => {
     const coll = db.collection("users");
 
     if (!id.match(/([0-9a-fA-F]{24})/)) {
-      res.statusCode = 400;
-      res.end(JSON.stringify({ error: "Invalid User ID format" }));
+      sendErrorResponse(res, 400, "Invalid User ID format");
       return;
     }
 
@@ -273,18 +267,13 @@ const deleteUserByIdHandler = async (req, res) => {
       document */
     if (result.deletedCount === 1) {
       console.log("Successfully deleted one document.");
-      res.statusCode = 200;
-      res.end(
-        JSON.stringify({ message: "Successfully deleted one document." })
-      );
+      sendSuccessResponse(res, 200, "Successfully deleted one document.");
     } else {
-      res.statusCode = 404;
-      res.end(JSON.stringify({ error: "User not found" }));
+      sendErrorResponse(res, 404, "User not found");
     }
   } catch (error) {
     console.error(error);
-    res.statusCode = 500;
-    res.end(JSON.stringify({ error: "Internal Server Error" }));
+    sendErrorResponse(res, 500, "Internal Server Error");
   }
 };
 
@@ -294,8 +283,7 @@ const refreshToken = async (req, res) => {
 
     // cookie isn't in the headers
     if (!cookie) {
-      res.statusCode = 401;
-      res.end(JSON.stringify({ error: "Not Authenticated" }));
+      sendErrorResponse(res, 401, "Not Authenticated");
       return;
     }
 
@@ -304,21 +292,19 @@ const refreshToken = async (req, res) => {
 
     // Token isn't in the request body
     if (!refreshToken) {
-      res.statusCode = 401;
-      res.end(JSON.stringify({ error: "Not Authenticated" }));
+      sendErrorResponse(res, 401, "Not Authenticated");
       return;
     }
 
     jwt.verify(refreshToken, JWT_REFRESH_SECRET, async (err, user) => {
       if (err) {
         console.log(err);
-        res.statusCode = 401;
 
         let errorMessage = "Unauthorized. Invalid token.";
         if (err instanceof jwt.TokenExpiredError) {
           errorMessage = "Unathorized. Token expired";
         }
-        res.end(JSON.stringify({ error: errorMessage }));
+        sendErrorResponse(res, 401, errorMessage);
         return;
       }
 
@@ -327,8 +313,7 @@ const refreshToken = async (req, res) => {
 
       // Send error if token isn't in the db
       if (!user_with_token) {
-        res.statusCode = 403;
-        res.end(JSON.stringify({ error: "Refresh token is not valid" }));
+        sendErrorResponse(res, 403, "Refresh token is not valid");
         return;
       }
 
@@ -343,8 +328,7 @@ const refreshToken = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.statusCode = 500;
-    res.end(JSON.stringify({ error: "Internal Server Error" }));
+    sendErrorResponse(res, 500, "Internal Server Error");
   }
 };
 
@@ -354,8 +338,7 @@ const logoutHandler = async (req, res) => {
 
     // cookie isn't in the headers
     if (!cookie) {
-      res.statusCode = 401;
-      res.end(JSON.stringify({ error: "Not Authenticated" }));
+      sendErrorResponse(res, 401, "Not Authenticated");
       return;
     }
 
@@ -364,21 +347,19 @@ const logoutHandler = async (req, res) => {
 
     // Token isn't in the request body
     if (!refreshToken) {
-      res.statusCode = 401;
-      res.end(JSON.stringify({ error: "Not Authenticated" }));
+      sendErrorResponse(res, 401, "Not Authenticated");
       return;
     }
 
     jwt.verify(refreshToken, JWT_REFRESH_SECRET, async (err, user) => {
       if (err) {
         console.log(err);
-        res.statusCode = 401;
 
         let errorMessage = "Unauthorized. Invalid token.";
         if (err instanceof jwt.TokenExpiredError) {
           errorMessage = "Unathorized. Token expired";
         }
-        res.end(JSON.stringify({ error: errorMessage }));
+        sendErrorResponse(res, 401, errorMessage);
         return;
       }
 
@@ -410,13 +391,11 @@ const logoutHandler = async (req, res) => {
       ];
       res.setHeader("Set-Cookie", cookieOptions.join("; "));
 
-      res.statusCode = 200;
-      res.end(JSON.stringify({ message: "User logged out successfully!" }));
+      sendSuccessResponse(res, 200, "User logged out successfully!");
     });
   } catch (error) {
     console.error(error);
-    res.statusCode = 500;
-    res.end(JSON.stringify({ error: "Internal Server Error" }));
+    sendErrorResponse(res, 500, "Internal Server Error");
   }
 };
 
