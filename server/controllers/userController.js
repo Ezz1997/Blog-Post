@@ -52,7 +52,7 @@ const getUserByIdHandler = async (req, res) => {
       {
         _id: ObjectId.createFromHexString(id),
       },
-      { projection: { password: 0 } }
+      { projection: { password: 0, refreshToken: 0 } }
     );
 
     if (user) {
@@ -194,8 +194,31 @@ const userLoginHandler = async (req, res) => {
         return;
       }
 
+      // Validate input lengths
+      if (
+        email.length > MAX_EMAIL_LENGTH ||
+        !(
+          password.length >= MIN_PASSWORD_LENGTH &&
+          password.length <= MAX_PASSWORD_LENGTH
+        )
+      ) {
+        sendErrorResponse(res, 422, "Invalid data lengths");
+        return;
+      }
+
+      // Validate email
+      if (!validator.isEmail(email)) {
+        sendErrorResponse(res, 400, "Invalid Email");
+        return;
+      }
+
+      // Sanitize email
+      const safeEmail = validator.normalizeEmail(email);
+
+      console.log(safeEmail);
+
       const coll = db.collection("users");
-      const existingUser = await coll.findOne({ email });
+      const existingUser = await coll.findOne({ email: safeEmail });
 
       if (existingUser) {
         const result = await bcrypt.compare(password, existingUser.password);
